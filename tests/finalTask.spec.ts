@@ -1,6 +1,6 @@
-import { test as base, Page } from "@playwright/test";
+import { test as base, expect, Page } from "@playwright/test";
 import { test } from "../fixtures/authenticatedShopPage.ts";
-import { ShopApiClient } from "../utils/shopApiClient.ts";
+import { Product, ShopApiClient } from "../utils/shopApiClient.ts";
 import {
 	epic,
 	feature,
@@ -22,8 +22,6 @@ import { PaymentPage } from "../pages/automationExercise/PaymentPage.ts";
 import { PaymentConfirmationPage } from "../pages/automationExercise/PaymentConfirmationPage.ts";
 import { ProductDetailPage } from "../pages/automationExercise/ProductDetailPage.ts";
 
-
-
 test.describe("Shopping", () => {
 	test(
 		"TC-SHOP-001 — Happy path: full shopping flow (register -> browse -> checkout)",
@@ -40,77 +38,78 @@ test.describe("Shopping", () => {
 			await description(
 				"A new user can register, add a product to the cart, and complete a full checkout.",
 			);
-            const shopHomePage = new ShopHomePage(page);
-            const signupLoginPage = new SignupLoginPage(page);
-            const accountCreationPage = new AccountCreationPage(page);
-            const productsPage = new ProductsPage(page);
-            const cartPage = new CartPage(page)
-            const checkoutPage = new CheckoutPage(page)
-            const paymentPage = new PaymentPage(page)
-            const paymentConfirmationPage = new PaymentConfirmationPage(page)
+			const shopHomePage = new ShopHomePage(page);
+			const signupLoginPage = new SignupLoginPage(page);
+			const accountCreationPage = new AccountCreationPage(page);
+			const productsPage = new ProductsPage(page);
+			const cartPage = new CartPage(page);
+			const checkoutPage = new CheckoutPage(page);
+			const paymentPage = new PaymentPage(page);
+			const paymentConfirmationPage = new PaymentConfirmationPage(page);
 
+			const newUser = generateUser();
 
+			await shopHomePage.goto();
+			await shopHomePage.clickConsent();
+			await shopHomePage.clickSignupLoginButton();
 
-            const newUser = generateUser();
-            
-            await shopHomePage.goto();
-            await shopHomePage.clickConsent();
-            await shopHomePage.clickSignupLoginButton();
+			await signupLoginPage.assertOnPage();
+			await signupLoginPage.fillSignupInputs(
+				newUser.username,
+				newUser.email,
+			);
+			await signupLoginPage.clickSignup();
 
-            await signupLoginPage.assertOnPage();
-            await signupLoginPage.fillSignupInputs(newUser.username, newUser.email);
-            await signupLoginPage.clickSignup();
+			await accountCreationPage.assertOnPage();
+			await accountCreationPage.enterAccountInformation(
+				newUser.title,
+				newUser.password,
+				newUser.day,
+				newUser.month,
+				newUser.year,
+				newUser.firstName,
+				newUser.lastName,
+				newUser.address,
+				newUser.country,
+				newUser.state,
+				newUser.city,
+				newUser.zipcode,
+				newUser.phone,
+			);
+			await accountCreationPage.clickCreateAccountButton();
+			await accountCreationPage.assertOnAccountCreatedPage();
 
-            await accountCreationPage.assertOnPage();
-            await accountCreationPage.enterAccountInformation(
-                newUser.title,
-                newUser.password,
-                newUser.day,
-                newUser.month,
-                newUser.year,
-                newUser.firstName,
-                newUser.lastName,
-                newUser.address,
-                newUser.country,
-                newUser.state,
-                newUser.city,
-                newUser.zipcode,
-                newUser.phone
-            )
-            await accountCreationPage.clickCreateAccountButton();
-            await accountCreationPage.assertOnAccountCreatedPage();
+			await accountCreationPage.clickContinue();
+			await shopHomePage.assertNavUsername(newUser.username);
 
-            await accountCreationPage.clickContinue();
-            await shopHomePage.assertNavUsername(newUser.username)
+			await shopHomePage.clickProductsButton();
+			await productsPage.assertOnPage();
 
-            await shopHomePage.clickProductsButton();
-            await productsPage.assertOnPage();
+			const firstProduct = await productsPage.getFirstProduct();
+			await firstProduct.hover();
+			await productsPage.clickProductsPopUpAddToCartButton(firstProduct);
+			await productsPage.clickModalViewCartButton();
+			await cartPage.assertOnPage();
 
-            const firstProduct = await productsPage.getFirstProduct();
-            await firstProduct.hover();
-            await productsPage.clickProductsPopUpAddToCartButton(firstProduct);
-            await productsPage.clickModalViewCartButton();
-            await cartPage.assertOnPage();
+			await cartPage.clickProceedToCheckout();
+			await checkoutPage.assertOnPage();
 
-            await cartPage.clickProceedToCheckout();
-            await checkoutPage.assertOnPage();
+			await checkoutPage.assertDeliveryAddress(
+				"",
+				newUser.address,
+				"",
+				newUser.city,
+				newUser.state,
+				newUser.zipcode,
+				newUser.country,
+			);
 
-            await checkoutPage.assertDeliveryAddress(
-                "",
-                newUser.address,
-                "",
-                newUser.city,
-                newUser.state,
-                newUser.zipcode,
-                newUser.country
-            )
+			await checkoutPage.clickPlaceOrder();
+			await paymentPage.fillCardInfo(newUser.card);
+			await paymentPage.clickPayButton();
 
-            await checkoutPage.clickPlaceOrder();
-            await paymentPage.fillCardInfo(newUser.card);
-            await paymentPage.clickPayButton();
-
-            await paymentConfirmationPage.assertOnPage();
-            await paymentConfirmationPage.assertIsOrderPlaced();
+			await paymentConfirmationPage.assertOnPage();
+			await paymentConfirmationPage.assertIsOrderPlaced();
 		},
 	);
 
@@ -130,15 +129,15 @@ test.describe("Shopping", () => {
 				"Searching for a product keyword filters the product list to matching items only.",
 			);
 
-            const productsPage = new ProductsPage(page);
+			const productsPage = new ProductsPage(page);
 
-			const query = "dress"
+			const query = "dress";
 			await productsPage.goto();
 			await productsPage.enterSearchQuery(query);
 			await productsPage.submitSearch();
 			await productsPage.assertAtLeastNProductsVisible(1);
 			await productsPage.assertSearchedProductsHeadingVisible();
-			await productsPage.assertAllProductsContainText(query)
+			await productsPage.assertAllProductsContainText(query);
 		},
 	);
 
@@ -164,23 +163,32 @@ test.describe("Shopping", () => {
 			await productsPage.goto();
 			await productsPage.assertOnPage();
 
-            const firstProductElement = await productsPage.getFirstProduct();
-			const firstProductData = await productsPage.getProductData(firstProductElement);
-            await firstProductElement.hover();
-			
-            await productsPage.clickProductsPopUpAddToCartButton(firstProductElement);
-            await productsPage.clickModalContinueShoppingButton();
-			
+			const firstProductElement = await productsPage.getFirstProduct();
+			const firstProductData =
+				await productsPage.getProductData(firstProductElement);
+			await firstProductElement.hover();
+
+			await productsPage.clickProductsPopUpAddToCartButton(
+				firstProductElement,
+			);
+			await productsPage.clickModalContinueShoppingButton();
+
 			const secondProductElement = await productsPage.getNthProduct(2);
-			const secondProductData = await productsPage.getProductData(secondProductElement);
+			const secondProductData =
+				await productsPage.getProductData(secondProductElement);
 
 			await secondProductElement.hover();
-            await productsPage.clickProductsPopUpAddToCartButton(secondProductElement);
-            await productsPage.clickModalViewCartButton();
+			await productsPage.clickProductsPopUpAddToCartButton(
+				secondProductElement,
+			);
+			await productsPage.clickModalViewCartButton();
 
-            await cartPage.assertOnPage();
+			await cartPage.assertOnPage();
 			await cartPage.assertCartRowsCount(2);
-			await cartPage.assertCartRowsData([firstProductData, secondProductData])
+			await cartPage.assertCartRowsData([
+				firstProductData,
+				secondProductData,
+			]);
 		},
 	);
 
@@ -201,14 +209,14 @@ test.describe("Shopping", () => {
 			);
 
 			const productsPage = new ProductsPage(page);
-            const cartPage = new CartPage(page)
+			const cartPage = new CartPage(page);
 
-			await productsPage.goto()
+			await productsPage.goto();
 
 			const firstProduct = await productsPage.getFirstProduct();
-            await firstProduct.hover();
-            await productsPage.clickProductsPopUpAddToCartButton(firstProduct);
-            await productsPage.clickModalViewCartButton();
+			await firstProduct.hover();
+			await productsPage.clickProductsPopUpAddToCartButton(firstProduct);
+			await productsPage.clickModalViewCartButton();
 
 			await cartPage.assertOnPage();
 			await cartPage.deleteFirstRow();
@@ -233,7 +241,7 @@ test.describe("Shopping", () => {
 			);
 
 			const productsPage = new ProductsPage(page);
-			const productDetailPage = new ProductDetailPage(page)
+			const productDetailPage = new ProductDetailPage(page);
 
 			await productsPage.goto();
 			const firstProductElement = await productsPage.getFirstProduct();
@@ -242,24 +250,17 @@ test.describe("Shopping", () => {
 			await productDetailPage.assertOnPage();
 			await productDetailPage.assertProductInformationPresent();
 			await productDetailPage.assertAddToCardButtonPresent();
-			
 		},
 	);
 });
 
 test.describe("Products API", () => {
-	let apiClient: ShopApiClient;
-
-	test.beforeEach(async ({ request }) => {
-		apiClient = new ShopApiClient(request);
-	});
-
 	test(
 		"TC-SHOP-006 — API: GET /api/productsList returns a valid product list",
 		{
 			tag: ["@api", "@products", "@p1"],
 		},
-		async () => {
+		async ({ request }) => {
 			await epic("API");
 			await feature("Products API");
 			await story("List all products");
@@ -270,7 +271,32 @@ test.describe("Products API", () => {
 				"Products endpoint returns a non-empty collection of valid products.",
 			);
 
-			// test implementation
+			const api = new ShopApiClient(request);
+			const body = await api.getProducts();
+
+			expect(body.responseCode).toBe(200);
+
+			expect(Array.isArray(body.products)).toBe(true);
+			expect(body.products.length).toBeGreaterThan(0);
+
+			for (const product of body.products) {
+				expect(product).toMatchObject({
+					id: expect.any(Number),
+					name: expect.any(String),
+					price: expect.any(String),
+					brand: expect.any(String),
+					category: expect.objectContaining({
+						usertype: expect.objectContaining({
+							usertype: expect.any(String),
+						}),
+						category: expect.any(String),
+					}),
+				});
+			}
+
+			const ids = body.products.map((product) => product.id);
+			const uniqueIds = new Set(ids);
+			expect(uniqueIds.size).toBe(ids.length);
 		},
 	);
 
