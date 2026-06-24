@@ -24,7 +24,7 @@ import { PaymentConfirmationPage } from "../pages/automationExercise/PaymentConf
 
 
 test.describe("Shopping", () => {
-	test.only(
+	test(
 		"TC-SHOP-001 — Happy path: full shopping flow (register -> browse -> checkout)",
 		{
 			tag: ["@shopping", "@checkout", "@p1"],
@@ -129,11 +129,19 @@ test.describe("Shopping", () => {
 				"Searching for a product keyword filters the product list to matching items only.",
 			);
 
-			// test implementation
+            const productsPage = new ProductsPage(page);
+
+			const query = "dress"
+			await productsPage.goto();
+			await productsPage.enterSearchQuery(query);
+			await productsPage.submitSearch();
+			await productsPage.assertAtLeastNProductsVisible(1);
+			await productsPage.assertSearchedProductsHeadingVisible();
+			await productsPage.assertAllProductsContainText(query)
 		},
 	);
 
-	test(
+	test.only(
 		"TC-SHOP-003 — Cart: adding multiple products updates the item count",
 		{
 			tag: ["@shopping", "@cart", "@p1"],
@@ -149,7 +157,29 @@ test.describe("Shopping", () => {
 				"Adding two different products to the cart results in both items appearing in the cart.",
 			);
 
-			// test implementation
+			const productsPage = new ProductsPage(page);
+			const cartPage = new CartPage(page);
+
+			await productsPage.goto();
+			await productsPage.assertOnPage();
+
+            const firstProductElement = await productsPage.getFirstProduct();
+			const firstProductData = await productsPage.getProductData(firstProductElement);
+            await firstProductElement.hover();
+			
+            await productsPage.clickProductsPopUpAddToCartButton(firstProductElement);
+            await productsPage.clickModalContinueShoppingButton();
+			
+			const secondProductElement = await productsPage.getNthProduct(2);
+			const secondProductData = await productsPage.getProductData(secondProductElement);
+
+			await secondProductElement.hover();
+            await productsPage.clickProductsPopUpAddToCartButton(secondProductElement);
+            await productsPage.clickModalViewCartButton();
+
+            await cartPage.assertOnPage();
+			await cartPage.assertCartRowsCount(2);
+			await cartPage.assertCartRowsData([firstProductData, secondProductData])
 		},
 	);
 

@@ -13,6 +13,7 @@ export class ShopHomePage extends BaseShopPage {
 
     async goto() {
         await this.page.goto("/")
+        await this.clickConsent();
     }
 
     async clickSignupLoginButton() {
