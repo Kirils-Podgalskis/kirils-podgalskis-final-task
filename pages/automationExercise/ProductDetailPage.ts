@@ -8,6 +8,6 @@ export class ProductDetailPage extends BaseShopPage {
     }
     
     async assertOnPage(options?: { timeout?: number }) {
-        
+        await this.deleteAdsContainer()
     }
 }
