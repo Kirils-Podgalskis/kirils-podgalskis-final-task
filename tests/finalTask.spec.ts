@@ -184,7 +184,7 @@ test.describe("Shopping", () => {
 		},
 	);
 
-	test(
+	test.only(
 		"TC-SHOP-004 — Cart: removing a product updates the cart",
 		{
 			tag: ["@shopping", "@cart", "@p1"],
@@ -200,7 +200,19 @@ test.describe("Shopping", () => {
 				"Deleting an item from the cart removes it from the product table.",
 			);
 
-			// test implementation
+			const productsPage = new ProductsPage(page);
+            const cartPage = new CartPage(page)
+			
+			await productsPage.goto()
+
+			const firstProduct = await productsPage.getFirstProduct();
+            await firstProduct.hover();
+            await productsPage.clickProductsPopUpAddToCartButton(firstProduct);
+            await productsPage.clickModalViewCartButton();
+
+			await cartPage.assertOnPage();
+			await cartPage.deleteFirstRow();
+			await cartPage.assertCartEmpty();
 		},
 	);
 

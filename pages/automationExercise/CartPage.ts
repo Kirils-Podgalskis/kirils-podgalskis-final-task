@@ -5,10 +5,12 @@ export class CartPage extends BaseShopPage {
     readonly proceedToCheckoutButton: Locator
 
     readonly cartRows: Locator
+    readonly deleteRowButton: Locator
     constructor(readonly page: Page) {
         super(page);
         this.proceedToCheckoutButton = page.getByText('Proceed To Checkout')
         this.cartRows = page.locator("tbody > tr")
+        this.deleteRowButton = page.locator('.cart_quantity_delete')
     }
     
     async assertOnPage(options?: { timeout?: number }) {
@@ -38,8 +40,18 @@ export class CartPage extends BaseShopPage {
             await expect(
                 this.cartRows.nth(index).locator(".cart_total")
             ).toContainText(rowsData[index].productPrice)
-            
-
         }
+    }
+
+    async deleteNthRow(nth:number) {
+        await this.deleteRowButton.nth(nth-1).click();
+    }
+
+    async deleteFirstRow() {
+        await this.deleteNthRow(1)
+    }
+
+    async assertCartEmpty() {
+        await expect(this.page.getByText('Cart is empty!')).toBeVisible();
     }
 }
