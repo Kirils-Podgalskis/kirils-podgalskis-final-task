@@ -14,7 +14,7 @@ export class ProductsPage extends BaseShopPage {
         this.searchProductInput = page.getByRole('textbox', {name:"Search Product"})
         this.submitSearchButton = page.locator("#submit_search")
         this.searchedProductsHeading = page.getByRole('heading', {name:"Searched Products"})
-        this.productBanner = page.locator(".single-products")
+        this.productBanner = page.locator(".product-image-wrapper")
         this.modalViewCartButton = page.getByRole('link', {name: "View cart"})
         this.modalContinueShoppingButton = page.getByRole('button', {name:"Continue Shopping"})
     }
@@ -31,7 +31,7 @@ export class ProductsPage extends BaseShopPage {
         return this.productBanner.nth(nth-1);
     }
     async getFirstProduct() {
-        return await this.getNthProduct(0)
+        return await this.getNthProduct(1)
     }
     async getLastProduct() {
         return this.productBanner.last()
@@ -82,5 +82,9 @@ export class ProductsPage extends BaseShopPage {
             productPrice: productPrice,
             productName: productName
         }
+    }
+
+    async clickViewProduct(product:Locator) {
+        await product.getByRole('link', { name: "View product"}).click()
     }
 }

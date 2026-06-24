@@ -20,6 +20,7 @@ import { CartPage } from "../pages/automationExercise/CartPage.ts";
 import { CheckoutPage } from "../pages/automationExercise/CheckoutPage.ts";
 import { PaymentPage } from "../pages/automationExercise/PaymentPage.ts";
 import { PaymentConfirmationPage } from "../pages/automationExercise/PaymentConfirmationPage.ts";
+import { ProductDetailPage } from "../pages/automationExercise/ProductDetailPage.ts";
 
 
 
@@ -219,7 +220,17 @@ test.describe("Shopping", () => {
 				"Opening a product detail page displays all expected product information.",
 			);
 
-			// test implementation
+			const productsPage = new ProductsPage(page);
+			const productDetailPage = new ProductDetailPage(page)
+
+			await productsPage.goto();
+			const firstProductElement = await productsPage.getFirstProduct();
+			await productsPage.clickViewProduct(firstProductElement);
+
+			await productDetailPage.assertOnPage();
+			await productDetailPage.assertProductInformationPresent();
+			await productDetailPage.assertAddToCardButtonPresent();
+			
 		},
 	);
 });
