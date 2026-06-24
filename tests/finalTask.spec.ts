@@ -184,7 +184,7 @@ test.describe("Shopping", () => {
 		},
 	);
 
-	test.only(
+	test(
 		"TC-SHOP-004 — Cart: removing a product updates the cart",
 		{
 			tag: ["@shopping", "@cart", "@p1"],
@@ -202,7 +202,7 @@ test.describe("Shopping", () => {
 
 			const productsPage = new ProductsPage(page);
             const cartPage = new CartPage(page)
-			
+
 			await productsPage.goto()
 
 			const firstProduct = await productsPage.getFirstProduct();
