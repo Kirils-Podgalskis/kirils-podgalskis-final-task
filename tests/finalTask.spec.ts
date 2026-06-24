@@ -305,7 +305,7 @@ test.describe("Products API", () => {
 		{
 			tag: ["@api", "@products", "@p1"],
 		},
-		async () => {
+		async ({ request }) => {
 			await epic("API");
 			await feature("Products API");
 			await story("Search products");
@@ -316,7 +316,20 @@ test.describe("Products API", () => {
 				"Searching products via API returns matching results.",
 			);
 
-			// test implementation
+			const query = "top";
+
+			const api = new ShopApiClient(request);
+			const body = await api.searchProducts(query);
+
+			expect(body.responseCode).toBe(200);
+
+			expect(body.products.length).toBeGreaterThan(0);
+
+			for (const product of body.products) {
+				expect(product.name.toLowerCase()).toContain(
+					query.toLowerCase(),
+				);
+			}
 		},
 	);
 

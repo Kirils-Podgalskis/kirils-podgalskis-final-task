@@ -49,7 +49,10 @@ export class ShopApiClient {
 	}
 
 	async searchProducts(keyword: string): Promise<ProductsResponse> {
-		return {} as ProductsResponse;
+		const res = await this.request.post(`${BASE_URL}/searchProduct`, {
+			form: { search_product: keyword },
+		});
+		return res.json() as Promise<ProductsResponse>;
 	}
 
 	async createAccount(user: ShopUser): Promise<void> {}
