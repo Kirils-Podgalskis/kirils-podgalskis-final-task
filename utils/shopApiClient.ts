@@ -18,6 +18,7 @@ export interface Product {
 export interface ProductsResponse {
 	responseCode: number;
 	products: Product[];
+	message: string | null;
 }
 
 export interface ShopUser {
@@ -48,10 +49,8 @@ export class ShopApiClient {
 		return res.json() as Promise<ProductsResponse>;
 	}
 
-	async searchProducts(keyword: string): Promise<ProductsResponse> {
-		const res = await this.request.post(`${BASE_URL}/searchProduct`, {
-			form: { search_product: keyword },
-		});
+	async searchProducts(body: object): Promise<ProductsResponse> {
+		const res = await this.request.post(`${BASE_URL}/searchProduct`, body);
 		return res.json() as Promise<ProductsResponse>;
 	}
 

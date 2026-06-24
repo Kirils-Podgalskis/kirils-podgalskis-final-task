@@ -318,8 +318,12 @@ test.describe("Products API", () => {
 
 			const query = "top";
 
+			const sendBody = {
+				form: { search_product: query },
+			}
+
 			const api = new ShopApiClient(request);
-			const body = await api.searchProducts(query);
+			const body = await api.searchProducts(sendBody);
 
 			expect(body.responseCode).toBe(200);
 
@@ -346,10 +350,17 @@ test.describe("Products API", () => {
 			await label("priority", "P2");
 			await label("layer", "api");
 			await description(
-				"Search endpoint returns 400 when required parameter is missign.",
+				"Search endpoint returns 400 when required parameter is missing",
 			);
 
-			// test implementation
+			const sendBody = {}
+
+			const api = new ShopApiClient(request);
+			const body = await api.searchProducts(sendBody);
+
+			expect(body.responseCode).toBe(400);
+			expect(body.message).toBeTruthy()
+
 		},
 	);
 });
