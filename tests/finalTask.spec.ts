@@ -382,7 +382,13 @@ test.describe("Marketing", () => {
 				"A visitor can subscribe to the newsletter from the footer.",
 			);
 
-			// test implementation
+			const shopHomePage = new ShopHomePage(page);
+			const newUser = generateUser();
+			await shopHomePage.goto();
+			await shopHomePage.clickConsent();
+			await shopHomePage.subscribeWithEmail(newUser.email);
+			await shopHomePage.assertSuccessfullSubscribtion();
+			await shopHomePage.assertEmailInputEmpty();
 		},
 	);
 });
