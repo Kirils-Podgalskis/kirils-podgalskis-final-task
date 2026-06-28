@@ -21,6 +21,11 @@ export class SignupLoginPage extends BaseShopPage {
         this.signupButton = page.getByTestId("signup-button")
     }
 
+    async goto() {
+        await this.page.goto("/login")
+        await this.clickConsent();
+    }
+
     async assertOnPage(options?: { timeout?: number }) {
         await expect(this.page).toHaveURL('/login');
         await this.deleteAdsContainer()

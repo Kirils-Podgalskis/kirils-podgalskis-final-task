@@ -83,7 +83,7 @@ export class AccountCreationPage extends BaseShopPage {
         await this.phoneInput.fill(phone)
     }
 
-    async clickCreateAccountButton() {90
+    async clickCreateAccountButton() {
         await this.createAccountButton.click();
     }
 

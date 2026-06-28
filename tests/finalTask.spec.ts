@@ -385,7 +385,6 @@ test.describe("Marketing", () => {
 			const shopHomePage = new ShopHomePage(page);
 			const newUser = generateUser();
 			await shopHomePage.goto();
-			await shopHomePage.clickConsent();
 			await shopHomePage.subscribeWithEmail(newUser.email);
 			await shopHomePage.assertSuccessfullSubscribtion();
 			await shopHomePage.assertEmailInputEmpty();
@@ -394,7 +393,7 @@ test.describe("Marketing", () => {
 });
 
 test.describe("Authentication", () => {
-	test(
+	test.only(
 		"TC-SHOP-010 — Session: authenticated user is redirected away from the login page",
 		{
 			tag: ["@auth", "@session", "@p2"],
@@ -409,10 +408,11 @@ test.describe("Authentication", () => {
 			await description(
 				"Authenticated users cannot access the login page.",
 			);
+			const signupLoginPage = new SignupLoginPage(authenticatedShopPage)
+			const shopHomePage = new ShopHomePage(authenticatedShopPage)
 
-			const page = authenticatedShopPage;
-
-			// test implementation
+			await signupLoginPage.goto();
+			await shopHomePage.assertOnPage();
 		},
 	);
 });
