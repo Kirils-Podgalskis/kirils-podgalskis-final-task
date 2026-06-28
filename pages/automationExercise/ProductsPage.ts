@@ -6,6 +6,7 @@ export class ProductsPage extends BaseShopPage {
     readonly submitSearchButton: Locator
     readonly searchedProductsHeading: Locator
     readonly productBanner: Locator
+    readonly modalContainer: Locator
     readonly modalViewCartButton:Locator
     readonly modalContinueShoppingButton:Locator
 
@@ -15,11 +16,19 @@ export class ProductsPage extends BaseShopPage {
         this.submitSearchButton = page.locator("#submit_search")
         this.searchedProductsHeading = page.getByRole('heading', {name:"Searched Products"})
         this.productBanner = page.locator(".product-image-wrapper")
+        this.modalContainer = page.locator("#cartModal")
         this.modalViewCartButton = page.getByRole('link', {name: "View cart"})
         this.modalContinueShoppingButton = page.getByRole('button', {name:"Continue Shopping"})
     }
     async goto() {
-        await this.page.goto("/products")
+        await Promise.all([
+            // FIXME: this request is not actually fired anywhere on the page, hence this 
+            // assetion fails. Added because task asks so
+            this.page.waitForResponse(resp =>
+                resp.url().includes('/api/productsList') && resp.status() === 200
+            ),
+            this.page.goto("/products")
+        ])
         await this.clickConsent();
     }
     async assertOnPage(options?: { timeout?: number }) {
@@ -42,6 +51,7 @@ export class ProductsPage extends BaseShopPage {
         await addToCartPopUpButton.scrollIntoViewIfNeeded();
         await this.deleteAdsContainer();
         await addToCartPopUpButton.click();
+        await expect(this.modalContainer).toBeVisible();
     }
     async clickModalViewCartButton() {
         await this.modalViewCartButton.click();
@@ -53,7 +63,12 @@ export class ProductsPage extends BaseShopPage {
         await this.searchProductInput.fill(query)
     }
     async submitSearch() {
-        await this.submitSearchButton.click();
+        await Promise.all([
+            this.page.waitForResponse(resp =>
+                resp.url().includes('/api/productsList') && resp.status() === 200
+            ),
+            this.submitSearchButton.click(),
+        ])
     } 
     async assertSearchedProductsHeadingVisible() {
         await expect(this.searchedProductsHeading).toBeVisible();

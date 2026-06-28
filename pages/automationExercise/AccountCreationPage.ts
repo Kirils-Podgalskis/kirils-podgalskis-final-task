@@ -50,9 +50,9 @@ export class AccountCreationPage extends BaseShopPage {
     async enterAccountInformation(
         title: string, 
         password: string, 
-        day: string,
+        day: number,
         month: string,
-        year: string,
+        year: number,
         firstName: string,
         lastName: string,
         address: string, 
@@ -70,9 +70,9 @@ export class AccountCreationPage extends BaseShopPage {
             throw new Error("Unkown name title!");
         }
         await this.passwordInput.fill(password)
-        await this.dayOptions.selectOption(day)
+        await this.dayOptions.selectOption(String(day))
         await this.monthOptions.selectOption(month)
-        await this.yearOptions.selectOption(year)
+        await this.yearOptions.selectOption(String(year))
         await this.firstNameInput.fill(firstName)
         await this.lastNameInput.fill(lastName)
         await this.addressInput.fill(address)

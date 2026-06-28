@@ -1,22 +1,26 @@
-export function generateUser() {
+import { ShopUser } from '../utils/shopApiClient.ts';
+
+export function generateUser(): ShopUser {
     const timestamp = Date.now();
 
     return {
+        name: `kptester${timestamp}`,
         title: "Mr",
-        firstName: `firstNameTester${timestamp}`,
-        lastName: `lastNameTester${timestamp}`,
-        username: `kptester${timestamp}`,
+        firstname: `firstNameTester${timestamp}`,
+        lastname: `lastNameTester${timestamp}`,
         email: `kptester${timestamp}@example.com`,
         password: 'password123',
-        address: 'Vingrotāju iela 1',
+        company: 'million dollar company',
+        address1: 'Vingrotāju iela 1',
+        address2: 'room',
         country: "India",
         state: "Indian State",
         city: "Indian City",
         zipcode: "6767",
-        phone: "67676767",
-        day: "6",
-        month: "July",
-        year: "1967",
+        mobile_number: "67676767",
+        birth_date: 6,
+        birth_month: "July",
+        birth_year: 1967,
         card: {
             nameOnCard: `firstNameTester${timestamp}`,
             cardNumber: "424242424242",

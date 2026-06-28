@@ -1,6 +1,6 @@
-import { test as base, expect, Page } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
 import { test } from "../fixtures/authenticatedShopPage.ts";
-import { Product, ShopApiClient } from "../utils/shopApiClient.ts";
+import { ShopApiClient } from "../utils/shopApiClient.ts";
 import {
 	epic,
 	feature,
@@ -55,7 +55,7 @@ test.describe("Shopping", () => {
 
 			await signupLoginPage.assertOnPage();
 			await signupLoginPage.fillSignupInputs(
-				newUser.username,
+				newUser.name,
 				newUser.email,
 			);
 			await signupLoginPage.clickSignup();
@@ -64,23 +64,23 @@ test.describe("Shopping", () => {
 			await accountCreationPage.enterAccountInformation(
 				newUser.title,
 				newUser.password,
-				newUser.day,
-				newUser.month,
-				newUser.year,
-				newUser.firstName,
-				newUser.lastName,
-				newUser.address,
+				newUser.birth_date,
+				newUser.birth_month,
+				newUser.birth_year,
+				newUser.firstname,
+				newUser.lastname,
+				newUser.address1,
 				newUser.country,
 				newUser.state,
 				newUser.city,
 				newUser.zipcode,
-				newUser.phone,
+				newUser.mobile_number,
 			);
 			await accountCreationPage.clickCreateAccountButton();
 			await accountCreationPage.assertOnAccountCreatedPage();
 
 			await accountCreationPage.clickContinue();
-			await shopHomePage.assertNavUsername(newUser.username);
+			await shopHomePage.assertNavUsername(newUser.name);
 
 			await shopHomePage.clickProductsButton();
 			await productsPage.assertOnPage();
@@ -96,7 +96,7 @@ test.describe("Shopping", () => {
 
 			await checkoutPage.assertDeliveryAddress(
 				"",
-				newUser.address,
+				newUser.address1,
 				"",
 				newUser.city,
 				newUser.state,
@@ -141,7 +141,7 @@ test.describe("Shopping", () => {
 		},
 	);
 
-	test(
+	test.only(
 		"TC-SHOP-003 — Cart: adding multiple products updates the item count",
 		{
 			tag: ["@shopping", "@cart", "@p1"],
@@ -164,8 +164,7 @@ test.describe("Shopping", () => {
 			await productsPage.assertOnPage();
 
 			const firstProductElement = await productsPage.getFirstProduct();
-			const firstProductData =
-				await productsPage.getProductData(firstProductElement);
+			const firstProductData = await productsPage.getProductData(firstProductElement);
 			await firstProductElement.hover();
 
 			await productsPage.clickProductsPopUpAddToCartButton(
@@ -393,7 +392,7 @@ test.describe("Marketing", () => {
 });
 
 test.describe("Authentication", () => {
-	test.only(
+	test(
 		"TC-SHOP-010 — Session: authenticated user is redirected away from the login page",
 		{
 			tag: ["@auth", "@session", "@p2"],

@@ -22,7 +22,24 @@ export interface ProductsResponse {
 }
 
 export interface ShopUser {
-	//TODO: fill
+	name: string, 
+	email: string,
+	password: string, 
+	title: string, 
+	birth_date: number, 
+	birth_month: string, 
+	birth_year: number, 
+	firstname: string, 
+	lastname: string, 
+	company: string, 
+	address1: string 
+	address2: string, 
+	country: string, 
+	zipcode: string, 
+	state: string, 
+	city: string, 
+	mobile_number: string,
+	card: object
 }
 
 export class ShopApiClient {
@@ -54,9 +71,38 @@ export class ShopApiClient {
 		return res.json() as Promise<ProductsResponse>;
 	}
 
-	async createAccount(user: ShopUser): Promise<void> {}
+	async createAccount(user: ShopUser): Promise<void> {
+		await this.request.post(`${BASE_URL}/api/createAccount`, {
+			multipart: {
+				name:         user.name,
+				email:        user.email,
+				password:     user.password,
+				title:        user.title,
+				birth_date:   user.birth_date,
+				birth_month:  user.birth_month,
+				birth_year:   user.birth_year,
+				firstname:    user.firstname,
+				lastname:     user.lastname,
+				company:      user.company,
+				address1:     user.address1,
+				address2:     user.address2,
+				country:      user.country,
+				zipcode:      user.zipcode,
+				state:        user.state,
+				city:         user.city,
+				mobile_number: user.mobile_number,
+			}
+		});
+	}
 
-	async deleteAccount(email: string, password: string): Promise<void> {}
+	async deleteAccount(email: string, password: string): Promise<void> {
+		await this.request.delete(`${BASE_URL}/deleteAccount`, {
+			form: { 
+				email: email,
+				password: password
+			},
+		})
+	}
 
 	async verifyLogin(email: string, password: string): Promise<boolean> {
 		return true;

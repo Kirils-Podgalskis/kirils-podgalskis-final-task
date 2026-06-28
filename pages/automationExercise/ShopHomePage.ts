@@ -43,6 +43,7 @@ export class ShopHomePage extends BaseShopPage {
         await this.subscribeSubmitButton.click();
     }
     async assertSuccessfullSubscribtion() {
+        await expect(this.subscribtionSuccessLabel).toBeVisible();
         await expect(this.subscribtionSuccessLabel).toContainText('You have been successfully subscribed!');
     }
     async assertEmailInputEmpty() {
