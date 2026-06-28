@@ -141,7 +141,7 @@ test.describe("Shopping", () => {
 		},
 	);
 
-	test.only(
+	test(
 		"TC-SHOP-003 — Cart: adding multiple products updates the item count",
 		{
 			tag: ["@shopping", "@cart", "@p1"],
